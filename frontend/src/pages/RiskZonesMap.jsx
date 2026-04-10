@@ -67,6 +67,7 @@ const RiskZonesMap = () => {
   const [riskZones, setRiskZones] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [lastUpdated, setLastUpdated] = useState(new Date())
   const mapRef = useRef(null)
 
   // Fetch predictions for grid points
@@ -110,7 +111,8 @@ const RiskZonesMap = () => {
       // Filter out failed predictions
       const validPredictions = predictions.filter(p => p !== null)
       setRiskZones(validPredictions)
-      
+      setLastUpdated(new Date())
+
     } catch (err) {
       setError('Failed to fetch predictions. Please ensure the backend is running.')
       console.error(err)
@@ -175,14 +177,14 @@ const RiskZonesMap = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] via-[#020617] to-[#020617]">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white/5 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Risk Zones Map</h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <h1 className="text-2xl font-bold text-white bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Risk Zones Map</h1>
+              <p className="text-sm text-gray-400 mt-1">
                 Visualize rockfall risk zones in mining regions
               </p>
             </div>
@@ -191,7 +193,7 @@ const RiskZonesMap = () => {
                 <select
                   value={selectedRegion}
                   onChange={handleRegionChange}
-                  className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-10 text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 cursor-pointer"
+                  className="appearance-none bg-white/5 border border-white/10 rounded-lg px-4 py-2 pr-10 text-sm font-medium focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 cursor-pointer text-white"
                 >
                   <option value="talcher">Talcher Coalfield</option>
                   <option value="korba">Korba Coalfield</option>
@@ -199,6 +201,28 @@ const RiskZonesMap = () => {
                 <ChevronDown className="h-5 w-5 text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
               </div>
             </div>
+          </div>
+
+          {/* System Status Bar */}
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center space-x-4">
+              <span className="flex items-center text-green-400">
+                <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                ACTIVE
+              </span>
+              <span className="text-gray-400">Data Source: Live (GEE)</span>
+              <span className="text-gray-400">Model: Fusion AI v1.0</span>
+            </div>
+            <span className="text-gray-500">
+              Last Updated: {lastUpdated.toLocaleString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+              })}
+            </span>
           </div>
         </div>
       </div>
@@ -208,54 +232,54 @@ const RiskZonesMap = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Left Panel - Stats */}
           <div className="lg:col-span-1 space-y-4">
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Risk Statistics</h2>
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_30px_rgba(6,182,212,0.2)] p-6">
+              <h2 className="text-lg font-semibold text-white mb-4">Risk Statistics</h2>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-danger-50 rounded-lg border border-danger-200">
+                <div className="flex items-center justify-between p-3 bg-red-500/10 rounded-lg border border-red-500/30">
                   <div className="flex items-center">
-                    <div className="w-4 h-4 rounded-full bg-danger-600 mr-3"></div>
-                    <span className="text-sm font-medium text-gray-700">HIGH Risk</span>
+                    <div className="w-4 h-4 rounded-full bg-red-500 mr-3 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
+                    <span className="text-sm font-medium text-gray-300">HIGH Risk</span>
                   </div>
-                  <span className="text-lg font-bold text-danger-700">{riskStats.HIGH}</span>
+                  <span className="text-lg font-bold text-red-400">{riskStats.HIGH}</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-warning-50 rounded-lg border border-warning-200">
+                <div className="flex items-center justify-between p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/30">
                   <div className="flex items-center">
-                    <div className="w-4 h-4 rounded-full bg-warning-600 mr-3"></div>
-                    <span className="text-sm font-medium text-gray-700">MEDIUM Risk</span>
+                    <div className="w-4 h-4 rounded-full bg-yellow-500 mr-3 shadow-[0_0_10px_rgba(234,179,8,0.5)]"></div>
+                    <span className="text-sm font-medium text-gray-300">MEDIUM Risk</span>
                   </div>
-                  <span className="text-lg font-bold text-warning-700">{riskStats.MEDIUM}</span>
+                  <span className="text-lg font-bold text-yellow-400">{riskStats.MEDIUM}</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-success-50 rounded-lg border border-success-200">
+                <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/30">
                   <div className="flex items-center">
-                    <div className="w-4 h-4 rounded-full bg-success-600 mr-3"></div>
-                    <span className="text-sm font-medium text-gray-700">LOW Risk</span>
+                    <div className="w-4 h-4 rounded-full bg-green-500 mr-3 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+                    <span className="text-sm font-medium text-gray-300">LOW Risk</span>
                   </div>
-                  <span className="text-lg font-bold text-success-700">{riskStats.LOW}</span>
+                  <span className="text-lg font-bold text-green-400">{riskStats.LOW}</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Legend</h2>
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_30px_rgba(6,182,212,0.2)] p-6">
+              <h2 className="text-lg font-semibold text-white mb-4">Legend</h2>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center">
-                  <div className="w-4 h-4 rounded-full bg-danger-600 mr-3"></div>
-                  <span className="text-gray-700">High Risk (Score &gt; 0.6)</span>
+                  <div className="w-4 h-4 rounded-full bg-red-500 mr-3 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
+                  <span className="text-gray-300">High Risk (Score &gt; 0.6)</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-4 h-4 rounded-full bg-warning-600 mr-3"></div>
-                  <span className="text-gray-700">Medium Risk (Score 0.4-0.6)</span>
+                  <div className="w-4 h-4 rounded-full bg-yellow-500 mr-3 shadow-[0_0_10px_rgba(234,179,8,0.5)]"></div>
+                  <span className="text-gray-300">Medium Risk (Score 0.4-0.6)</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-4 h-4 rounded-full bg-success-600 mr-3"></div>
-                  <span className="text-gray-700">Low Risk (Score &lt; 0.4)</span>
+                  <div className="w-4 h-4 rounded-full bg-green-500 mr-3 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+                  <span className="text-gray-300">Low Risk (Score &lt; 0.4)</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-blue-50 rounded-xl shadow-lg p-6 border border-blue-200">
-              <h2 className="text-lg font-semibold text-blue-900 mb-3">Real-Time AI Predictions</h2>
-              <p className="text-sm text-blue-800">
+            <div className="bg-cyan-500/10 backdrop-blur-xl rounded-2xl shadow-[0_0_30px_rgba(6,182,212,0.2)] p-6 border border-cyan-500/30">
+              <h2 className="text-lg font-semibold text-cyan-400 mb-3">Real-Time AI Predictions</h2>
+              <p className="text-sm text-gray-400">
                 This map displays real-time risk predictions from our AI model. Each marker represents a location where the system analyzed slope, rainfall, and vegetation data from Google Earth Engine to predict rockfall risk.
               </p>
             </div>
@@ -263,25 +287,25 @@ const RiskZonesMap = () => {
 
           {/* Right Panel - Map */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_30px_rgba(6,182,212,0.2)] overflow-hidden">
               <div className="h-[600px] relative">
                 {loading && (
-                  <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-[1000]">
+                  <div className="absolute inset-0 bg-[#020617]/90 flex items-center justify-center z-[1000] backdrop-blur-sm">
                     <div className="text-center">
-                      <Loader2 className="h-12 w-12 text-primary-600 animate-spin mx-auto mb-4" />
-                      <p className="text-gray-700 font-medium">Fetching real-time predictions...</p>
-                      <p className="text-sm text-gray-500 mt-1">Analyzing {REGION_CONFIGS[selectedRegion].gridSize * REGION_CONFIGS[selectedRegion].gridSize} locations</p>
+                      <Loader2 className="h-12 w-12 text-cyan-400 animate-spin mx-auto mb-4" />
+                      <p className="text-white font-medium">Fetching real-time predictions...</p>
+                      <p className="text-sm text-gray-400 mt-1">Analyzing {REGION_CONFIGS[selectedRegion].gridSize * REGION_CONFIGS[selectedRegion].gridSize} locations</p>
                     </div>
                   </div>
                 )}
                 {error && (
-                  <div className="absolute inset-0 bg-white bg-opacity-95 flex items-center justify-center z-[1000]">
+                  <div className="absolute inset-0 bg-[#020617]/95 flex items-center justify-center z-[1000] backdrop-blur-sm">
                     <div className="text-center p-6">
-                      <AlertTriangle className="h-12 w-12 text-danger-600 mx-auto mb-4" />
-                      <p className="text-danger-700 font-medium mb-2">{error}</p>
+                      <AlertTriangle className="h-12 w-12 text-red-400 mx-auto mb-4" />
+                      <p className="text-red-400 font-medium mb-2">{error}</p>
                       <button
                         onClick={() => fetchPredictions(selectedRegion)}
-                        className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                        className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:scale-105 text-white rounded-lg transition-all shadow-lg shadow-cyan-500/30"
                       >
                         Retry
                       </button>

@@ -273,11 +273,11 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] via-[#020617] to-[#020617]">
       <div className="max-w-full mx-auto">
-        <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="bg-white/5 backdrop-blur-xl border-b border-white/10">
           <div className="px-6 py-4">
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+            <h1 className="text-2xl font-bold text-white bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent flex items-center">
               <Mountain className="h-7 w-7 mr-3 text-primary-600" />
               Rockfall Prediction Dashboard
             </h1>
@@ -286,47 +286,47 @@ const Dashboard = () => {
 
         <div className="flex h-[calc(100vh-73px)]">
           {/* Left Sidebar - Input System */}
-          <div className="w-80 bg-white border-r border-gray-200 p-6 overflow-y-auto">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-              <MapPin className="h-5 w-5 mr-2 text-primary-600" />
+          <div className="w-80 bg-white/5 backdrop-blur-xl border-r border-white/10 p-6 overflow-y-auto">
+            <h2 className="text-lg font-semibold text-gray-200 mb-6 flex items-center">
+              <MapPin className="h-5 w-5 mr-2 text-cyan-400" />
               Location Input
             </h2>
 
             {/* Toggle Input Mode */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-sm font-medium text-gray-300 mb-3">
                 Input Method
               </label>
               <div className="space-y-2">
-                <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <label className="flex items-center p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 transition-colors">
                   <input
                     type="radio"
                     value="map"
                     checked={inputMode === 'map'}
                     onChange={(e) => setInputMode(e.target.value)}
-                    className="h-4 w-4 text-primary-600"
+                    className="h-4 w-4 text-cyan-600 bg-white/5 border-white/10"
                   />
-                  <span className="ml-3 text-sm text-gray-700">Click on Map</span>
+                  <span className="ml-3 text-sm text-gray-300">Click on Map</span>
                 </label>
-                <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <label className="flex items-center p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 transition-colors">
                   <input
                     type="radio"
                     value="manual"
                     checked={inputMode === 'manual'}
                     onChange={(e) => setInputMode(e.target.value)}
-                    className="h-4 w-4 text-primary-600"
+                    className="h-4 w-4 text-cyan-600 bg-white/5 border-white/10"
                   />
-                  <span className="ml-3 text-sm text-gray-700">Enter Coordinates</span>
+                  <span className="ml-3 text-sm text-gray-300">Enter Coordinates</span>
                 </label>
-                <label className="flex items-center p-3 border border-primary-200 bg-primary-50 rounded-lg cursor-pointer hover:bg-primary-100 transition-colors">
+                <label className="flex items-center p-3 border-cyan-500/30 bg-cyan-500/10 rounded-lg cursor-pointer hover:bg-cyan-500/20 transition-colors">
                   <input
                     type="radio"
                     value="region"
                     checked={inputMode === 'region'}
                     onChange={(e) => setInputMode(e.target.value)}
-                    className="h-4 w-4 text-primary-600"
+                    className="h-4 w-4 text-cyan-600 bg-white/5 border-white/10"
                   />
-                  <span className="ml-3 text-sm text-gray-700 font-medium">Select Mining Region</span>
+                  <span className="ml-3 text-sm text-cyan-400 font-medium">Select Mining Region</span>
                 </label>
               </div>
             </div>
@@ -334,14 +334,14 @@ const Dashboard = () => {
             {/* Region Selection Dropdown */}
             {inputMode === 'region' && (
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Select Region
                 </label>
                 <div className="relative">
                   <select
                     value={selectedRegion}
                     onChange={(e) => handleRegionSelect(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none bg-white cursor-pointer"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 appearance-none text-white cursor-pointer"
                   >
                     <option value="">Choose a mining region...</option>
                     {Object.entries(MINING_REGIONS).map(([key, region]) => (
@@ -359,22 +359,22 @@ const Dashboard = () => {
             )}
 
             {/* Alert Monitoring System */}
-            <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+            <div className="mb-6 p-4 bg-white/5 backdrop-blur-xl rounded-xl border border-white/10">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-gray-900">Real-Time Alerts</h3>
+                <h3 className="text-sm font-semibold text-gray-200">Real-Time Alerts</h3>
                 <button
                   onClick={() => setSoundEnabled(!soundEnabled)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-400 hover:text-cyan-400"
                   title={soundEnabled ? 'Disable sound' : 'Enable sound'}
                 >
                   {soundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
                 </button>
               </div>
-              
+
               {!alertMonitoring ? (
                 <button
                   onClick={startMonitoring}
-                  className="w-full flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  className="w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:scale-105 text-white rounded-lg transition-all shadow-lg shadow-cyan-500/30"
                 >
                   <Navigation className="h-5 w-5 mr-2" />
                   Start Monitoring
@@ -382,24 +382,24 @@ const Dashboard = () => {
               ) : (
                 <button
                   onClick={stopMonitoring}
-                  className="w-full flex items-center justify-center px-4 py-2 bg-danger-600 text-white rounded-lg hover:bg-danger-700 transition-colors"
+                  className="w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:scale-105 text-white rounded-lg transition-all shadow-lg shadow-red-500/30"
                 >
                   <X className="h-5 w-5 mr-2" />
                   Stop Monitoring
                 </button>
               )}
-              
+
               {alertMonitoring && currentLocation && (
-                <div className="mt-3 text-xs text-gray-600">
-                  <p><strong>Current Location:</strong></p>
+                <div className="mt-3 text-xs text-gray-400">
+                  <p><strong className="text-gray-300">Current Location:</strong></p>
                   <p>Lat: {currentLocation.lat.toFixed(6)}</p>
                   <p>Lon: {currentLocation.lng.toFixed(6)}</p>
                 </div>
               )}
-              
+
               {alertStatus && (
                 <div className={`mt-3 p-2 rounded-lg text-center text-sm font-medium ${
-                  alertStatus === 'HIGH' ? 'bg-danger-100 text-danger-700' : 'bg-warning-100 text-warning-700'
+                  alertStatus === 'HIGH' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30'
                 }`}>
                   {alertStatus === 'HIGH' ? '🚨 HIGH RISK ALERT' : '⚠️ MEDIUM RISK ALERT'}
                 </div>
@@ -410,7 +410,7 @@ const Dashboard = () => {
             {inputMode === 'manual' && (
               <div className="mb-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Latitude
                   </label>
                   <input
@@ -419,11 +419,11 @@ const Dashboard = () => {
                     value={manualLat}
                     onChange={(e) => setManualLat(e.target.value)}
                     placeholder="e.g., 20.95"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Longitude
                   </label>
                   <input
@@ -432,12 +432,12 @@ const Dashboard = () => {
                     value={manualLon}
                     onChange={(e) => setManualLon(e.target.value)}
                     placeholder="e.g., 85.10"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-500"
                   />
                 </div>
                 <button
                   onClick={handleManualInput}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 py-2 rounded-lg font-medium transition-colors"
+                  className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white py-2 rounded-lg font-medium transition-colors"
                 >
                   Set Location
                 </button>
@@ -446,16 +446,16 @@ const Dashboard = () => {
 
             {/* Selected Location Info */}
             {selectedLocation && (
-              <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">Selected Location</h3>
+              <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 mb-6 border border-white/10">
+                <h3 className="text-sm font-semibold text-gray-200 mb-3">Selected Location</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Latitude:</span>
-                    <span className="font-medium">{selectedLocation.lat.toFixed(6)}</span>
+                    <span className="text-gray-400">Latitude:</span>
+                    <span className="font-medium text-white">{selectedLocation.lat.toFixed(6)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Longitude:</span>
-                    <span className="font-medium">{selectedLocation.lng.toFixed(6)}</span>
+                    <span className="text-gray-400">Longitude:</span>
+                    <span className="font-medium text-white">{selectedLocation.lng.toFixed(6)}</span>
                   </div>
                 </div>
                 <button
@@ -466,7 +466,7 @@ const Dashboard = () => {
                     setPrediction(null)
                     setError(null)
                   }}
-                  className="mt-3 text-sm text-gray-500 hover:text-gray-700 flex items-center"
+                  className="mt-3 text-sm text-gray-400 hover:text-cyan-400 flex items-center"
                 >
                   <X className="h-4 w-4 mr-1" />
                   Clear
@@ -478,7 +478,7 @@ const Dashboard = () => {
             <button
               onClick={handlePredict}
               disabled={!selectedLocation || loading}
-              className="w-full bg-primary-600 hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold transition-all flex items-center justify-center space-x-2"
+              className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold transition-all shadow-lg shadow-cyan-500/30 flex items-center justify-center space-x-2"
             >
               {loading ? (
                 <>
@@ -502,7 +502,7 @@ const Dashboard = () => {
 
           {/* Center - Map */}
           <div className="flex-1 p-6">
-            <div className="bg-white rounded-xl shadow-lg h-full overflow-hidden">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_30px_rgba(6,182,212,0.2)] h-full overflow-hidden">
               <div className="h-full">
                 <MapContainer
                   ref={mapRef}
@@ -534,21 +534,43 @@ const Dashboard = () => {
           </div>
 
           {/* Right Panel - Results */}
-          <div className="w-96 bg-white border-l border-gray-200 p-6 overflow-y-auto">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-              <Activity className="h-5 w-5 mr-2 text-primary-600" />
+          <div className="w-96 bg-white/5 backdrop-blur-xl border-l border-white/10 p-6 overflow-y-auto">
+            {/* System Status */}
+            <div className="mb-6 p-4 bg-gradient-to-r from-cyan-500/10 to-blue-600/10 backdrop-blur-xl rounded-xl border border-cyan-500/30">
+              <h3 className="text-xs font-semibold text-cyan-400 mb-3 uppercase tracking-wide">System Status</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Status:</span>
+                  <span className="flex items-center text-green-400 font-medium">
+                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                    ACTIVE
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Data Source:</span>
+                  <span className="text-cyan-400 font-medium">Live (GEE)</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Model:</span>
+                  <span className="text-white font-medium">Fusion AI v1.0</span>
+                </div>
+              </div>
+            </div>
+
+            <h2 className="text-lg font-semibold text-white mb-6 flex items-center">
+              <Activity className="h-5 w-5 mr-2 text-cyan-400" />
               Prediction Results
             </h2>
 
             {!prediction && !loading && (
               <div className="text-center py-12">
-                <Map className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500">
-                  {selectedLocation 
-                    ? 'Click "Predict Risk" to see results'
-                    : 'Select a location to begin'
-                  }
-                </p>
+                <Map className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-400 font-medium mb-4">How to use:</p>
+                <div className="text-left text-sm text-gray-400 space-y-2 bg-white/5 rounded-lg p-4 border border-white/10">
+                  <p>1. Click on map OR enter coordinates</p>
+                  <p>2. Select mining region (optional)</p>
+                  <p>3. Click "Predict Risk"</p>
+                </div>
               </div>
             )}
 
