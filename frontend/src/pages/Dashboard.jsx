@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet'
-import { Mountain, MapPin, Activity, Droplets, Thermometer, Leaf, AlertTriangle, CheckCircle, Map, X, ChevronDown } from 'lucide-react'
+import { Mountain, MapPin, Activity, Droplets, Thermometer, Leaf, AlertTriangle, CheckCircle, Map, X, ChevronDown, Volume2, VolumeX, Navigation } from 'lucide-react'
 import axios from 'axios'
 import 'leaflet/dist/leaflet.css'
 
@@ -50,6 +50,122 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const mapRef = useRef(null)
+
+  // Alert system state
+  const [alertMonitoring, setAlertMonitoring] = useState(false)
+  const [soundEnabled, setSoundEnabled] = useState(true)
+  const [currentLocation, setCurrentLocation] = useState(null)
+  const [alertStatus, setAlertStatus] = useState(null) // 'HIGH', 'MEDIUM', 'LOW', or null
+  const [showAlertPopup, setShowAlertPopup] = useState(false)
+  const locationWatchId = useRef(null)
+
+  // Play buzzer sound
+  const playBuzzer = () => {
+    if (!soundEnabled) return
+    
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
+      
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
+      
+      oscillator.frequency.value = 800
+      oscillator.type = 'square'
+      gainNode.gain.value = 0.1
+      
+      oscillator.start()
+      oscillator.stop(audioContext.currentTime + 0.5)
+      
+      // Repeat beep pattern
+      setTimeout(() => {
+        const osc2 = audioContext.createOscillator()
+        const gain2 = audioContext.createGain()
+        osc2.connect(gain2)
+        gain2.connect(audioContext.destination)
+        osc2.frequency.value = 800
+        osc2.type = 'square'
+        gain2.gain.value = 0.1
+        osc2.start()
+        osc2.stop(audioContext.currentTime + 0.5)
+      }, 600)
+    } catch (err) {
+      console.error('Error playing buzzer:', err)
+    }
+  }
+
+  // Check current location for risk
+  const checkLocationRisk = async (lat, lon) => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/predict', {
+        lat: lat,
+        lon: lon
+      })
+      
+      const risk = response.data.risk
+      
+      if (risk === 'HIGH' || risk === 'MEDIUM') {
+        setAlertStatus(risk)
+        setShowAlertPopup(true)
+        if (risk === 'HIGH') {
+          playBuzzer()
+        }
+      } else {
+        setAlertStatus('LOW')
+        setShowAlertPopup(false)
+      }
+    } catch (err) {
+      console.error('Error checking location risk:', err)
+    }
+  }
+
+  // Start location monitoring
+  const startMonitoring = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser')
+      return
+    }
+
+    locationWatchId.current = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords
+        setCurrentLocation({ lat: latitude, lng: longitude })
+        checkLocationRisk(latitude, longitude)
+      },
+      (error) => {
+        console.error('Error getting location:', error)
+        alert('Unable to retrieve your location')
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      }
+    )
+    
+    setAlertMonitoring(true)
+  }
+
+  // Stop location monitoring
+  const stopMonitoring = () => {
+    if (locationWatchId.current) {
+      navigator.geolocation.clearWatch(locationWatchId.current)
+      locationWatchId.current = null
+    }
+    setAlertMonitoring(false)
+    setAlertStatus(null)
+    setShowAlertPopup(false)
+  }
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (locationWatchId.current) {
+        navigator.geolocation.clearWatch(locationWatchId.current)
+      }
+    }
+  }, [])
 
   const handleLocationSelect = (latlng) => {
     setSelectedLocation(latlng)
@@ -241,6 +357,54 @@ const Dashboard = () => {
                 </p>
               </div>
             )}
+
+            {/* Alert Monitoring System */}
+            <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-gray-900">Real-Time Alerts</h3>
+                <button
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  className="text-gray-500 hover:text-gray-700"
+                  title={soundEnabled ? 'Disable sound' : 'Enable sound'}
+                >
+                  {soundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+                </button>
+              </div>
+              
+              {!alertMonitoring ? (
+                <button
+                  onClick={startMonitoring}
+                  className="w-full flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  <Navigation className="h-5 w-5 mr-2" />
+                  Start Monitoring
+                </button>
+              ) : (
+                <button
+                  onClick={stopMonitoring}
+                  className="w-full flex items-center justify-center px-4 py-2 bg-danger-600 text-white rounded-lg hover:bg-danger-700 transition-colors"
+                >
+                  <X className="h-5 w-5 mr-2" />
+                  Stop Monitoring
+                </button>
+              )}
+              
+              {alertMonitoring && currentLocation && (
+                <div className="mt-3 text-xs text-gray-600">
+                  <p><strong>Current Location:</strong></p>
+                  <p>Lat: {currentLocation.lat.toFixed(6)}</p>
+                  <p>Lon: {currentLocation.lng.toFixed(6)}</p>
+                </div>
+              )}
+              
+              {alertStatus && (
+                <div className={`mt-3 p-2 rounded-lg text-center text-sm font-medium ${
+                  alertStatus === 'HIGH' ? 'bg-danger-100 text-danger-700' : 'bg-warning-100 text-warning-700'
+                }`}>
+                  {alertStatus === 'HIGH' ? '🚨 HIGH RISK ALERT' : '⚠️ MEDIUM RISK ALERT'}
+                </div>
+              )}
+            </div>
 
             {/* Manual Input Fields */}
             {inputMode === 'manual' && (
@@ -501,10 +665,87 @@ const Dashboard = () => {
             )}
           </div>
         </div>
+
+        {/* Real-Time Alert Popup */}
+        {showAlertPopup && alertStatus && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+            <div className={`bg-white rounded-2xl shadow-2xl p-8 max-w-md mx-4 ${
+              alertStatus === 'HIGH' ? 'border-4 border-danger-500' : 'border-4 border-warning-500'
+            }`}>
+              <div className="text-center">
+                <div className={`w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center ${
+                  alertStatus === 'HIGH' ? 'bg-danger-100' : 'bg-warning-100'
+                }`}>
+                  <AlertTriangle className={`h-10 w-10 ${
+                    alertStatus === 'HIGH' ? 'text-danger-600' : 'text-warning-600'
+                  }`} />
+                </div>
+                
+                <h2 className={`text-2xl font-bold mb-2 ${
+                  alertStatus === 'HIGH' ? 'text-danger-900' : 'text-warning-900'
+                }`}>
+                  {alertStatus === 'HIGH' ? '🚨 HIGH RISK ALERT' : '⚠️ MEDIUM RISK ALERT'}
+                </h2>
+                
+                <p className="text-gray-600 mb-6">
+                  {alertStatus === 'HIGH' 
+                    ? 'You are currently in a HIGH RISK area for rockfall. Immediate action required!'
+                    : 'You are in a MEDIUM RISK area. Exercise caution and monitor conditions.'}
+                </p>
+                
+                <div className="space-y-3 mb-6">
+                  {alertStatus === 'HIGH' ? (
+                    <>
+                      <div className="bg-danger-50 rounded-lg p-4 text-left">
+                        <h4 className="font-semibold text-danger-900 mb-2">Immediate Actions:</h4>
+                        <ul className="text-sm text-danger-800 space-y-1">
+                          <li>• Evacuate the area immediately</li>
+                          <li>• Alert all personnel</li>
+                          <li>• Move to safe zone</li>
+                          <li>• Contact emergency services</li>
+                        </ul>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="bg-warning-50 rounded-lg p-4 text-left">
+                      <h4 className="font-semibold text-warning-900 mb-2">Cautionary Actions:</h4>
+                      <ul className="text-sm text-warning-800 space-y-1">
+                        <li>• Monitor slope stability</li>
+                        <li>• Reduce heavy machinery use</li>
+                        <li>• Keep escape routes clear</li>
+                        <li>• Stay alert for changes</li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowAlertPopup(false)}
+                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                  >
+                    Dismiss
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowAlertPopup(false)
+                      stopMonitoring()
+                    }}
+                    className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  >
+                    Stop Alerts
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
 }
+
+export default Dashboard
 
 const FeatureExplanation = ({ icon, label, value, unit, level }) => {
   const colorClasses = {
@@ -528,5 +769,3 @@ const FeatureExplanation = ({ icon, label, value, unit, level }) => {
     </div>
   )
 }
-
-export default Dashboard
